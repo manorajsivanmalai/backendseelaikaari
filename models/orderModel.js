@@ -14,7 +14,7 @@ const createOrder = async (orderData) => {
       order_id, customer_name, email, phone, address, city, state, payment_id, signature,country, pincode, 
       payment_method, shipping_charges, total_amount, weight, 
       shipment_id, awb_code, courier_name, order_status, created_at, updated_at,user_id
-    ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10,$11, $12, $13, $14, $15, $16,$17,$18, $19, NOW(), NOW(),$20)
+    ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10,$11, $12, $13, $14, $15, $16,$17,$18, $19, NOW(), NOW(),$20) RETURNING *
   `;
 
   const values = [

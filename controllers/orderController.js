@@ -77,24 +77,24 @@ const verifyPaymentAndCreateOrder = async (req, res) => {
       user
     };
   const result = await orderModel.createOrder(newOrder);
-
+  console.log(result.id)
     // Insert order items into the cartItems table
     for (let item of cartItems) {
       const orderItem = {
-        order_id: result.insertId,   // The ID of the order we just created
+        order_id: result[0].id,   // The ID of the order we just created
         product_id: item.id,  // From the request body
         quantity: item.quantity || 1, // Default to 1 if quantity is not provided
         price: item.price || 0,       // Default to 0 if price is missing
         total_amount: parseInt(item.price)*parseInt(item.quantity) || 0
       };
-       await orderModel.createOrderItem(orderItem);
+        await orderModel.createOrderItem(orderItem);
     }
 
     // Get ShipRocket API token
     const token = await getShipRocketToken();
 
     // Create the order in ShipRocket
-     const shipmentID = await orderModel.createShipRocketOrder(newOrder, token);
+   const shipmentID = await orderModel.createShipRocketOrder(newOrder, token);
 
     // Nodemailer setup
 
@@ -207,11 +207,11 @@ const verifyPaymentAndCreateOrder = async (req, res) => {
     
 
     // Send emails
-     await transporter.sendMail(customerMailOptions);
-     console.log(`Email sent to customer: ${userDetails.email}`);
+    //  await transporter.sendMail(customerMailOptions);
+    //  console.log(`Email sent to customer: ${userDetails.email}`);
 
-     await transporter.sendMail(ownerMailOptions);
-     console.log("Email sent to store owner: seelaikaari123@gmail.com");
+    //  await transporter.sendMail(ownerMailOptions);
+    //  console.log("Email sent to store owner: seelaikaari123@gmail.com");
 
     res.status(201).json({ success: true, message: "Order stored, email sent to customer & owner!", order: newOrder });
   } catch (error) {
