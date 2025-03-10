@@ -7,6 +7,7 @@ dotenv.config();
 app.use(express.json()); 
 app.use(cors());
 const db = require('./config/db');
+const serverless = require("serverless-http");
 const userRoutes = require('./routes/userRoutes');
 const productsRoutes=require("./routes/productRoutes");
 const wishlistRoutes=require("./routes/wishlistRoutes");
@@ -26,5 +27,8 @@ app.use("/",(req,res)=>{
 
 
 
-const PORT = process.env.PORT || 5000;
-app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+module.exports = app;
+module.exports.handler = serverless(app); 
+// const PORT = process.env.PORT || 5000;
+
+// app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
