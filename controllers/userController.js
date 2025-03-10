@@ -182,11 +182,14 @@ const registerUser = async (req, res) => {
   try {
     const { name, email, phone, password, isgauth } = req.body;
     
+    
     const existingUser = await userModel.getUserByEmail(email);
-   
+     
+     
     if (existingUser) {
       const userId1=existingUser.id;
       const email1=existingUser.email
+
       const token1 = jwt.sign({ id: userId1, email:email1 }, process.env.JWT_SECRET, {
         expiresIn: process.env.JWT_EXPIRY,
       });
@@ -202,7 +205,7 @@ const registerUser = async (req, res) => {
     
     // Generate JWT Token for verification or session
     const token = jwt.sign(
-      { id:userId.insertId, email },
+      { id:userId.id, email },
       process.env.JWT_SECRET,
       { expiresIn: process.env.JWT_EXPIRY }
     );
@@ -322,7 +325,7 @@ const updateUser= async (req, res) => {
 
 const forgotPasswordLink =async (req,res)=>{
   const { email } = req.body;
-  console.log(email);
+  
   
 const existingUser = await userModel.getUserByEmail(email);
 

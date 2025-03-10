@@ -14,7 +14,7 @@ const createOrder = async (orderData) => {
       order_id, customer_name, email, phone, address, city, state, payment_id, signature,country, pincode, 
       payment_method, shipping_charges, total_amount, weight, 
       shipment_id, awb_code, courier_name, order_status, created_at, updated_at,user_id
-    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?,?, ?, ?, ?, ?, ?,?,?, ?, NOW(), NOW(),?)
+    ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10,$11, $12, $13, $14, $15, $16,$17,$18, $19, NOW(), NOW(),$20)
   `;
 
   const values = [
@@ -24,8 +24,8 @@ const createOrder = async (orderData) => {
   ];
 
   try {
-    const [result] = await db.query(query, values);
-    return result; // Returns the result of the insert query
+    const result = await db.query(query, values);
+    return result.rows; // Returns the result of the insert query
   } catch (err) {
     console.error("Error during order creation:", err);
     throw err; // Propagate the error
@@ -38,13 +38,13 @@ const createOrderItem = async (orderItemData) => {
 
   const query = `
     INSERT INTO order_items (order_id, product_id, quantity, price, total_amount)
-    VALUES (?, ?, ?, ?, ?)
+    VALUES ($1, $2, $3, $4, $5)
   `;
 
   const values = [order_id, product_id, quantity, price, total_amount];
 
-  const [result] = await db.query(query, values);
-  return result; // Returns the result of the insert query
+  const result = await db.query(query, values);
+  return result.rows; // Returns the result of the insert query
 };
 
 // Update order details after shipping (like shipment_id, awb_code, courier_name, order_status)
@@ -54,12 +54,12 @@ const updateOrder = async (orderId, updateFields) => {
   } = updateFields;
   
   try {
-    const [result] = await db.query(
-      `UPDATE orders SET shipment_id = ?, awb_code = ?, courier_name = ?, order_status = ? 
-      WHERE order_id = ?`,
+    const result = await db.query(
+      `UPDATE orders SET shipment_id = $1, awb_code = $2, courier_name = $3, order_status = $4 
+      WHERE order_id = $5`,
       [shipment_id, awb_code, courier_name, order_status, orderId]
     );
-    return result;
+    return result.rows;
   } catch (err) {
     console.error("Error updating order:", err);
     throw err;
@@ -69,7 +69,7 @@ const updateOrder = async (orderId, updateFields) => {
 // Get order by order_id (used for tracking)
 const getOrderByUserId = async (userId) => {
   try {
-    const [rows] = await db.query(`
+    const result = await db.query(`
       SELECT 
         orders.order_id, orders.total_amount,
         orders.order_status,orders.shipment_id,orders.payment_id,orders.address,
@@ -81,11 +81,11 @@ const getOrderByUserId = async (userId) => {
       INNER JOIN  
         products ON order_items.product_id = products.id
       WHERE 
-        orders.user_id = ?
+        orders.user_id = $1
     `, [userId]);
-    console.log(rows);
+  
     
-    return rows;
+    return result.rows;
   } catch (err) {
     console.error("Error fetching order:", err);
     throw err;
@@ -180,7 +180,7 @@ const createShipRocketOrder = async (order, token) => {
   const saveTracking = async (orderID, shipmentID) => {
     try {
       // Update the order with the shipment ID in your database
-      await db.query('UPDATE orders SET shipment_id = ? WHERE order_id = ?', [shipmentID, orderID]);
+      await db.query('UPDATE orders SET shipment_id = $1 WHERE order_id = $2', [shipmentID, orderID]);
       console.log('Tracking ID saved successfully!');
     } catch (error) {
       console.error('Error saving tracking ID:', error);

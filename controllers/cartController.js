@@ -5,6 +5,7 @@ const Cart = require('../models/addtocartModel');
 const addToCart = async (req, res) => {
   try {
     const { userId, productId } = req.body;
+
     if (!userId || !productId) {
       return res.status(400).json({ error: 'User ID, Product ID, and quantity are required' });
     }
@@ -20,10 +21,12 @@ const addToCart = async (req, res) => {
 const getUserCart = async (req, res) => {
   try {
     const { userId } = req.params;
-
+  
     const cartItems = await Cart.getCartByUserId(userId);
+   
     res.status(200).json(cartItems);
   } catch (error) {
+  
     res.status(500).json({ error: 'Server error' });
   }
 };

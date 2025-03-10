@@ -52,11 +52,10 @@ const verifyPaymentAndCreateOrder = async (req, res) => {
       .update(order_id + "|" + payment_id)
       .digest("hex");
 
-    // if (expectedSignature !== signature) {
-    //   return res.status(400).json({ success: false, message: "Invalid payment signature!" });
-    // }
+    if (expectedSignature !== signature) {
+      return res.status(400).json({ success: false, message: "Invalid payment signature!" });
+    }
 
- 
 
     const newOrder = {
       order_id: order_id || null,

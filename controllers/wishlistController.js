@@ -20,7 +20,7 @@ const addToWishlist = async (req, res) => {
 const getUserWishlist = async (req, res) => {
   try {
     const { userId } = req.params;
-
+   
     const wishlistItems = await Wishlist.getWishlistByUserId(userId);
     res.status(200).json(wishlistItems);
   } catch (error) {
