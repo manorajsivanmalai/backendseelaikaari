@@ -14,8 +14,7 @@ const razorpay = new Razorpay({
 const createRazorpayOrder = async (req, res) => {   
   try {
     const { amount } = req.body;
-    console.log(amount);
-    
+   
     if (!amount) {
       return res.status(400).json({ success: false, message: "Amount is required!" });
     }
@@ -76,8 +75,8 @@ const verifyPaymentAndCreateOrder = async (req, res) => {
       order_items:cartItems,
       user
     };
-  const result = await orderModel.createOrder(newOrder);
-  console.log(result.id)
+   const result = await orderModel.createOrder(newOrder);
+  
     // Insert order items into the cartItems table
     for (let item of cartItems) {
       const orderItem = {
@@ -91,10 +90,10 @@ const verifyPaymentAndCreateOrder = async (req, res) => {
     }
 
     // Get ShipRocket API token
-    const token = await getShipRocketToken();
+     const token = await getShipRocketToken();
 
     // Create the order in ShipRocket
-   const shipmentID = await orderModel.createShipRocketOrder(newOrder, token);
+    const shipmentID = await orderModel.createShipRocketOrder(newOrder, token);
 
     // Nodemailer setup
 
@@ -109,7 +108,7 @@ const verifyPaymentAndCreateOrder = async (req, res) => {
     const customerMailOptions = {
       from: process.env.EMAIL_USER,
       to: userDetails.email,
-      subject: "Order Confirmation from Akilesh Store",
+      subject: "Order Confirmation from Seelaikaari Store",
       html: `
         <div style="font-family: Arial, sans-serif; max-width: 600px; margin: auto; border: 1px solid #ddd; border-radius: 10px; padding: 20px; background-color: #f9f9f9;">
           <div style="text-align: center; padding-bottom: 20px;">
@@ -130,7 +129,7 @@ const verifyPaymentAndCreateOrder = async (req, res) => {
               <tbody>
                 ${cartItems.map(item =>`
                   <tr>
-                    <td style="padding: 10px; border-bottom: 1px solid #eee;">${item.name}</td>
+                    <td style="padding: 10px; border-bottom: 1px solid #eee;">${item.name}<br/><img src="${item.image}" alt="${item.name}" width="60px"/></td>
                     <td style="padding: 10px; text-align: center; border-bottom: 1px solid #eee;">${item.quantity}</td>
                     <td style="padding: 10px; text-align: right; border-bottom: 1px solid #eee;">₹${item.price}</td>
                   </tr>
@@ -149,8 +148,8 @@ const verifyPaymentAndCreateOrder = async (req, res) => {
           </div>
     
           <div style="margin-top: 20px; text-align: center; padding: 15px; font-size: 12px; color: #999;">
-            <p>For any queries, contact us at support@akileshstore.com</p>
-            <p>&copy; 2025 Akilesh Store. All rights reserved.</p>
+            <p>For any queries, contact us at support@Seelaikaaristore.com</p>
+            <p>&copy; 2025 Seelaikaari Store. All rights reserved.</p>
           </div>
         </div>
       `
@@ -158,8 +157,8 @@ const verifyPaymentAndCreateOrder = async (req, res) => {
     // Email to Store Owner
     const ownerMailOptions = {
       from: process.env.EMAIL_USER,
-      to: "smanoraj25@gmail.com",
-      subject: "New Order Received - Akilesh Store",
+      to: "seelaikaari123@gmail.com",
+      subject: "New Order Received - Seelaikaari Store",
       html: `
         <div style="font-family: Arial, sans-serif; max-width: 600px; margin: auto; border: 1px solid #ddd; border-radius: 10px; padding: 20px; background-color: #f9f9f9;">
           <h2 style="color: #4CAF50; text-align: center;">New Order Received</h2>
@@ -170,6 +169,7 @@ const verifyPaymentAndCreateOrder = async (req, res) => {
           <p><strong>Name:</strong> ${userDetails.name}</p>
           <p><strong>Email:</strong> ${userDetails.email}</p>
           <p><strong>Phone:</strong> ${userDetails.phone}</p>
+          <p><strong>Phone:</strong> ${userDetails.address1 +", "+userDetails.address2 +", "+ userDetails.state +", "+ userDetails.city+", "+userDetails.pincode }</p>
     
           <h3 style="color: #333;">Order Summary:</h3>
           <table style="width: 100%; border-collapse: collapse; margin-top: 10px;">
@@ -183,7 +183,7 @@ const verifyPaymentAndCreateOrder = async (req, res) => {
             <tbody>
               ${cartItems.map(item => `
                 <tr>
-                  <td style="padding: 10px; border-bottom: 1px solid #eee;">${item.name}</td>
+                  <td style="padding: 10px; border-bottom: 1px solid #eee;">${item.name}<br/><img src="${item.image}" alt="${item.name}" width="60px"/></td>
                   <td style="padding: 10px; text-align: center; border-bottom: 1px solid #eee;">${item.quantity}</td>
                   <td style="padding: 10px; text-align: right; border-bottom: 1px solid #eee;">₹${item.price}</td>
                 </tr>
@@ -198,8 +198,8 @@ const verifyPaymentAndCreateOrder = async (req, res) => {
           <p style="margin-top: 20px; color: #555;">Please process the order accordingly.</p>
     
           <div style="margin-top: 20px; text-align: center; padding: 15px; font-size: 12px; color: #999;">
-            <p>For any queries, contact us at support@akileshstore.com</p>
-            <p>&copy; 2025 Akilesh Store. All rights reserved.</p>
+            <p>For any queries, contact us at support@Seelaikaaristore.com</p>
+            <p>&copy; 2025 Seelaikaari Store. All rights reserved.</p>
           </div>
         </div>
       `
@@ -207,12 +207,12 @@ const verifyPaymentAndCreateOrder = async (req, res) => {
     
 
     // Send emails
-    //  await transporter.sendMail(customerMailOptions);
-    //  console.log(`Email sent to customer: ${userDetails.email}`);
+     await transporter.sendMail(customerMailOptions);
+     console.log(`Email sent to customer: ${userDetails.email}`);
 
-    //  await transporter.sendMail(ownerMailOptions);
-    //  console.log("Email sent to store owner: seelaikaari123@gmail.com");
-
+     await transporter.sendMail(ownerMailOptions);
+     console.log("Email sent to store owner: seelaikaari123@gmail.com");
+    
     res.status(201).json({ success: true, message: "Order stored, email sent to customer & owner!", order: newOrder });
   } catch (error) {
     console.error("Error during payment verification:", error);
